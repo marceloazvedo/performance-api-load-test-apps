@@ -15,6 +15,7 @@ import io.r2dbc.spi.ConnectionFactoryOptions.PASSWORD
 import io.r2dbc.spi.ConnectionFactoryOptions.PORT
 import io.r2dbc.spi.ConnectionFactoryOptions.PROTOCOL
 import io.r2dbc.spi.ConnectionFactoryOptions.USER
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -38,9 +39,18 @@ class DatabaseConfiguration(
     @Value("\${spring.r2dbc.maximum-pool-size}")
     private val maxPoolSize: Int,
 ) {
+
+    companion object {
+        val LOGGER = LoggerFactory.getLogger(DatabaseConfiguration::class.java)
+    }
+
     @Bean
     @Qualifier("customConnectionFactory")
     fun connectionFactory(): ConnectionFactory {
+
+        LOGGER.info("initial pool size: {}", initialPoolSize)
+        LOGGER.info("max pool size: {}", maxPoolSize)
+
         return ConnectionFactories.get(
             ConnectionFactoryOptions.builder()
                 .option(DRIVER, "pool")

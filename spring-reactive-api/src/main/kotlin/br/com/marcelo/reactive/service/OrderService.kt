@@ -95,7 +95,7 @@ class OrderService(
             .bind("taxId", orderContext.order!!.customer!!.taxId!!)
             .fetch()
             .first()
-            .map { it["id"] as Long }
+            .map { (it["id"] as Int).toLong() }
             .map {
                 orderContext.copy(customerEntity = CustomerEntity(
                     id = it,
@@ -114,7 +114,7 @@ class OrderService(
             .fetch()
             .first()
             .map {
-                val tableId = it["table_id"] as Long
+                val tableId = (it["table_id"] as Int).toLong()
                 val orderId = it["id"] as String
                 Pair(orderId, tableId)
             }
@@ -141,7 +141,7 @@ class OrderService(
                     .bind("ofOrder", orderContext.orderEntity!!.tableId)
                     .fetch().first()
                     .map {
-                        it["id"] as Long
+                        (it["id"] as Int).toLong()
                     }
             }.collectList()
             .flatMap {
