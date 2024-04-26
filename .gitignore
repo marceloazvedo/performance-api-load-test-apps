@@ -1,0 +1,4 @@
+/data/*
+/spring-reactive-api/build
+/spring-traditional-api/build
+/gatling-performance-api-test/build
