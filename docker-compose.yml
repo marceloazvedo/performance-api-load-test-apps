@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    hostname: postgres-db
+    image: postgres:15.6
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: spring-api-performance-test
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - api-performance-test
+
+  pgadmin:
+    hostname: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123admin
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
+    networks:
+      - api-performance-test
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin
+
+  mockserver:
+    hostname: mockserver
+    image: mockserver/mockserver:5.14.0
+    ports:
+      - 1080:1080
+    environment:
+      MOCKSERVER_INITIALIZATION_JSON_PATH: ./config/initializerJson.json
+    networks:
+      - api-performance-test
+    volumes:
+      - type: bind
+        source: .
+        target: /config
+
+networks:
+  api-performance-test:
+    name: performance-test-network
+    driver: bridge

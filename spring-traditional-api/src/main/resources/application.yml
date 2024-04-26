@@ -1,0 +1,44 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-api-performance
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://postgres-db:5432/spring-api-performance-test
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+    initialization-mode: never
+    hikari:
+      maximum-pool-size: ${db_maximum_pool_size:100}
+      minimum-idle: ${db_minimum_idle:100}
+
+clients:
+  seller: http://mockserver:1080
+  risk-analysis: http://mockserver:1080
+  payment-gateway: http://mockserver:1080
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 20000
+        readTimeout: 20000
+
+logging:
+  level:
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: TRACE
+    com.zaxxer.hikari.HikariPool: DEBUG
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    org.springframework.boot.autoconfigure.jdbc.DataSourceProperties: DEBUG

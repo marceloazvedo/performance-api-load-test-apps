@@ -1,0 +1,46 @@
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/gateway/pay"
+    },
+    "httpResponse": {
+      "body": {
+        "code": "uuid",
+        "message": "SUCCESS"
+      },
+      "delay": {
+        "timeUnit": "SECONDS",
+        "value": 1
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/sellers/authorization"
+    },
+    "httpResponse": {
+      "body": "OK",
+      "delay": {
+        "timeUnit": "MILLISECONDS",
+        "value": 200
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/risk-analysis/validate"
+    },
+    "httpResponse": {
+      "body": {
+        "recommendation": "APPROVE"
+      },
+      "delay": {
+        "timeUnit": "MILLISECONDS",
+        "value": 500
+      }
+    }
+  }
+]

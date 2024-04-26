@@ -1,0 +1,35 @@
+{
+  "payment": {
+    "amount": 100000,
+    "payment_method": {
+      "type": "CREDIT_CARD",
+      "installments": 3,
+      "card": {
+        "number": "1111222233334444",
+        "holder": "Farmindrongo Pernelope",
+        "cvv": "123",
+        "expiration_date": "12-2031"
+      }
+    }
+  },
+  "items": [
+    {
+      "name": "lampada magica",
+      "quantity": 2,
+      "value": 50000
+    }
+  ],
+  "customer": {
+    "full_name": "Farmindrongo Pernelope",
+    "tax_id": "11111111111",
+    "address": {
+      "street": "rua dos bobos",
+      "number": "AP 101",
+      "state": "RN",
+      "city": "Santana do Seridó",
+      "locality": "Centro",
+      "zipCode": "59350000",
+      "complement": null
+    }
+  }
+}
