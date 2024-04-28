@@ -17,6 +17,7 @@ import java.util.UUID
         Index(columnList = "orderId", unique = true),
         Index(columnList = "referenceId"),
     ],
+    name = "ORDER"
 )
 data class OrderEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +30,7 @@ data class OrderEntity(
     val customer: CustomerEntity,
 )
 
-@Entity
+@Entity(name = "ITEM")
 data class ItemEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -38,7 +39,7 @@ data class ItemEntity(
     val quantity: Int,
 )
 
-@Entity
+@Entity(name = "CUSTOMER")
 data class CustomerEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,

@@ -28,3 +28,10 @@ O argumento `-p 8081:8081` vai expor a porta 8080 no seu localhost e assim você
 poderá realizar requisições direto para a máquina.
 
 > Porém, a aplicação pode não rodar por não conseguir acesso ao banco de dados.
+
+Comando curto para limpar e construir a aplicação, buildar a imagem docker e a executar:
+```shell
+./gradlew clean build && \
+	docker build -t spring-reactive-api . && \
+	docker run --network performance-test-network -p 8081:8081 -e DB_MAXIMUM_POOL_SIZE=100 -e DB_MINIMUM_IDLE=10 spring-reactive-api:latest
+```

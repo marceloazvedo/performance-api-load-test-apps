@@ -9,10 +9,10 @@ import reactor.core.publisher.Mono
 @Component
 class SellerClient(
     @Value("\${clients.seller}")
-    private val sellerUrl: String
+    private val sellerUrl: String,
+    private val webClientBuilder: WebClient.Builder,
 ) {
-    private val webClient: WebClient = WebClient.builder()
-        .baseUrl(sellerUrl).build()
+    private val webClient: WebClient = webClientBuilder.baseUrl(sellerUrl).build()
     fun validateToken(
         @RequestParam("authorization-token") authorizationToken: String,
     ): Mono<String> = webClient.get().uri("/sellers/authorization")

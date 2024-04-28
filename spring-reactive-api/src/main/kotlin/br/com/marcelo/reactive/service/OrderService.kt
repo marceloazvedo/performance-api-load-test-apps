@@ -35,6 +35,7 @@ class OrderService(
     }
 
     fun create(serverRequest: ServerRequest): Mono<OrderDTO> {
+        LOGGER.info("Creating order: {}", count++)
         val authorization = serverRequest.headers().header("Authorization").first()
         return serverRequest.bodyToMono(OrderDTO::class.java)
             .map { orderDTO ->
@@ -92,15 +93,15 @@ class OrderService(
         return databaseClient.sql("INSERT INTO  customer_entity (full_name, tax_id) VALUES (:fullName, :taxId)")
             .filter { statement, _ -> statement.returnGeneratedValues("id").execute() }
             .bind("fullName", orderContext.order!!.customer!!.fullName!!)
-            .bind("taxId", orderContext.order!!.customer!!.taxId!!)
+            .bind("taxId", orderContext.order.customer!!.taxId!!)
             .fetch()
             .first()
             .map { (it["id"] as Int).toLong() }
             .map {
                 orderContext.copy(customerEntity = CustomerEntity(
                     id = it,
-                    fullName = orderContext.order!!.customer!!.fullName!!,
-                    taxId = orderContext.order!!.customer!!.taxId!!
+                    fullName = orderContext.order.customer.fullName!!,
+                    taxId = orderContext.order.customer.taxId!!
                 ))
             }
     }
@@ -124,7 +125,7 @@ class OrderService(
                     tableId = tableId,
                     items = listOf(),
                     customer = orderContext.customerEntity,
-                    referenceId = orderContext.order!!.referenceId!!,
+                    referenceId = orderContext.order.referenceId!!,
                 )
                 orderContext.copy(orderEntity = orderEntity)
             }

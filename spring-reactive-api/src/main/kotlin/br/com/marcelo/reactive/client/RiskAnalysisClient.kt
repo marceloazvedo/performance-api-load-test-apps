@@ -13,8 +13,9 @@ import reactor.core.publisher.Mono
 class RiskAnalysisClient(
     @Value("\${clients.risk-analysis}")
     private val riskAnalysisUrl: String,
+    private val webClientBuilder: WebClient.Builder
 ) {
-    private val webClient: WebClient = WebClient.builder().baseUrl(riskAnalysisUrl).build()
+    private val webClient: WebClient = webClientBuilder.baseUrl(riskAnalysisUrl).build()
     fun analyseTransaction(
         @RequestBody transactionData: TransactionDataDTO,
     ): Mono<RiskAnalysisRecommendation>

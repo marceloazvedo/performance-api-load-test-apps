@@ -12,9 +12,10 @@ import reactor.core.publisher.Mono
 class PaymentGatewayClient(
     @Value("\${clients.payment-gateway}")
     private val gatewayUrl: String,
+    private val webClientBuilder: WebClient.Builder,
 ) {
 
-    private val webClient: WebClient = WebClient.builder().baseUrl(gatewayUrl).build()
+    private val webClient: WebClient = webClientBuilder.baseUrl(gatewayUrl).build()
 
     fun pay(paymentMethodDTO: PaymentMethodDTO): Mono<PaymentResponse> =
         webClient.post()

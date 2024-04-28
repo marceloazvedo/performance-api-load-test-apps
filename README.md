@@ -13,6 +13,14 @@ Esse docker vai subir os seguintes serviços:
 - PGAdmin: Interface visual para realizar interação com o banco;
 - Mockserver: Servidor para criação de mocks com base em requests REST.
 
+Sendo assim, para realizar a comparação entre as APIs nós temos que ter
+projeto de teste de performance capaz de realizar as requests com o 
+objetivo de medir o desempenho das duas aplicações! Sendo assim, abaixo
+seguem a listagem dos projetos:
+- Projeto de teste de performance: [gatling-performance-api-test](./gatling-performance-api-test/);
+- API Tradicional: [spring-traditional-api](./spring-traditional-api/);
+- API Reativa: [spring-reactive-api](./spring-reactive-api/).
+
 ## Configurando mocks
 Caso o mock que sobe nesse docker-compose.yml não inicialize com sua
 configuração realize as requests abaixo para inicia-ló:
@@ -151,4 +159,17 @@ curl --request POST \
 		}
 	}
 }'
+```
+
+## Executando o teste de carga
+
+Navegue até a pasta do projeto [./gatlin-performance-api-test/](gatlin-performance-api-test) e build o projeto:
+```shell
+./gradlew clean build
+```
+Lembre-se sempre de usar o Java 17.
+
+Agora execute o teste:
+```shell
+./gradlew gatlinRun
 ```
