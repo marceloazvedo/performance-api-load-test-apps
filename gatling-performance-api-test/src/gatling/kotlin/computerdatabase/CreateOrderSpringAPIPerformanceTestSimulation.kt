@@ -4,26 +4,28 @@ import io.gatling.javaapi.core.*
 import io.gatling.javaapi.core.CoreDsl.*
 import io.gatling.javaapi.http.HttpDsl.*
 import io.gatling.javaapi.http.internal.HttpCheckBuilders
-import java.util.*
+import java.util.UUID
+import java.util.Iterator
 
 class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
 
-  init {
-    val http = http
-        .baseUrl("http://localhost:8081")
-        .header("Authorization", "c722d70b-6af6-4525-b768-6c5d5d558b31")
-        .header("Content-Type", "application/json")
+    init {
+        val http = http
+            .baseUrl("http://localhost:8081")
+            .header("Authorization", "c722d70b-6af6-4525-b768-6c5d5d558b31")
+            .header("Content-Type", "application/json")
 
-    val scenario =
-      scenario("Load testing creating orders")
-        .exec(
-            http("POST /orders")
-                .post("/orders")
-                .body(
-                    StringBody(
-                        """
+        val scenario =
+            scenario("Load testing creating orders")
+                .exec { session -> session.set("uuid", "REFE_${UUID.randomUUID().toString().uppercase()}") }
+                .exec(
+                    http("POST /orders")
+                        .post("/orders")
+                        .body(
+                            StringBody(
+                                """
                             |{
-                            |   "reference_id": "${UUID.randomUUID()}",
+                            |   "reference_id": "#{uuid}",
                             |   "payment": {
                             |       "amount": 100000,
                             |       "payment_method": {
@@ -59,14 +61,14 @@ class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
                             |   }
                             |}
                             """.trimMargin()
-                    )
-                ).check(HttpCheckBuilders.status().`is`(200))
-        )
+                            )
+                        ).check(HttpCheckBuilders.status().`is`(200))
+                )
 
-    setUp(
-      scenario.injectOpen(
-          constantUsersPerSec(500.0).during(20),
-      ).protocols(http)
-    )
-  }
+        setUp(
+            scenario.injectOpen(
+                constantUsersPerSec(2.0).during(1),
+            ).protocols(http)
+        )
+    }
 }

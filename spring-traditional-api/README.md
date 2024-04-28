@@ -28,3 +28,10 @@ O argumento `-p 8081:8081` vai expor a porta 8080 no seu localhost e assim você
 poderá realizar requisições direto para a máquina.
 
 > Porém, a aplicação pode não rodar por não conseguir acesso ao banco de dados.
+
+Comando curto para limpar e constru
+```shell
+./gradlew clean build && \
+	docker build -t spring-traditional-api . && \
+	docker run --network performance-test-network -p 8081:8081 -e DB_MAXIMUM_POOL_SIZE=100 -e DB_MINIMUM_IDLE=10 spring-traditional-api:latest
+```

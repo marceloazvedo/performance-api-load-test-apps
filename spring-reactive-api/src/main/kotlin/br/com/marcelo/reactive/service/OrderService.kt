@@ -5,10 +5,8 @@ import br.com.marcelo.reactive.client.RiskAnalysisClient
 import br.com.marcelo.reactive.client.SellerClient
 import br.com.marcelo.reactive.context.OrderContext
 import br.com.marcelo.reactive.dto.AnalysisRecommendation
-import br.com.marcelo.reactive.dto.ItemDTO
 import br.com.marcelo.reactive.dto.OrderDTO
 import br.com.marcelo.reactive.entity.CustomerEntity
-import br.com.marcelo.reactive.entity.ItemEntity
 import br.com.marcelo.reactive.entity.OrderEntity
 import br.com.marcelo.reactive.exception.IdempontencyException
 import br.com.marcelo.reactive.exception.PaymentDeclinedException
@@ -19,8 +17,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.server.ServerRequest
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
-import java.util.*
+import java.util.UUID
 
 @Service
 class OrderService(
@@ -32,23 +29,26 @@ class OrderService(
     companion object {
         val LOGGER = LoggerFactory.getLogger(OrderService::class.java)
         var count = 1
+        val ORDER_NOT_FOUND = "Order not found"
     }
 
     fun create(serverRequest: ServerRequest): Mono<OrderDTO> {
         LOGGER.info("Creating order: {}", count++)
         val authorization = serverRequest.headers().header("Authorization").first()
         return serverRequest.bodyToMono(OrderDTO::class.java)
-            .map { orderDTO ->
-                OrderContext(
-                    order = orderDTO,
-                    sellerAccessToken = authorization
-                )
-            }
+            .map { createContext(it, authorization) }
+            .doOnNext { LOGGER.info("reference_id={}", it.order!!.referenceId) }
             .flatMap(this::validateRequest)
             .flatMap(this::callGateway)
             .flatMap(this::save)
             .map { it.order!!.copy(id = it.orderEntity!!.id) }
     }
+
+    private fun createContext(orderDTO: OrderDTO, authorization: String): OrderContext =
+        OrderContext(
+            order = orderDTO,
+            sellerAccessToken = authorization
+        )
 
     private fun validateRequest(orderContext: OrderContext): Mono<OrderContext> {
         return verifyIdempotency(orderContext)
@@ -58,12 +58,12 @@ class OrderService(
 
     private fun verifyIdempotency(orderContext: OrderContext): Mono<OrderContext> {
         return databaseClient.sql("SELECT id FROM order_entity WHERE reference_id = :referenceId LIMIT 1")
-            .bind("referenceId", UUID.randomUUID().toString())
+            .bind("referenceId", orderContext.order!!.referenceId!!)
             .fetch().one()
             .map { it["id"] as String }
-            .defaultIfEmpty("Order not found")
+            .defaultIfEmpty(ORDER_NOT_FOUND)
             .map {
-                if (it != "Order not found") throw IdempontencyException()
+                if (it != ORDER_NOT_FOUND) throw IdempontencyException()
                 orderContext
             }
     }
