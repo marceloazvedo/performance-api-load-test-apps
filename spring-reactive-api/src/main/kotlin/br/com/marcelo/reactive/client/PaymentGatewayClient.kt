@@ -14,7 +14,6 @@ class PaymentGatewayClient(
     private val gatewayUrl: String,
     private val webClientBuilder: WebClient.Builder,
 ) {
-
     private val webClient: WebClient = webClientBuilder.baseUrl(gatewayUrl).build()
 
     fun pay(paymentMethodDTO: PaymentMethodDTO): Mono<PaymentResponse> =

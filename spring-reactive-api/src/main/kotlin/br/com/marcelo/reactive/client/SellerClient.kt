@@ -13,9 +13,11 @@ class SellerClient(
     private val webClientBuilder: WebClient.Builder,
 ) {
     private val webClient: WebClient = webClientBuilder.baseUrl(sellerUrl).build()
+
     fun validateToken(
         @RequestParam("authorization-token") authorizationToken: String,
-    ): Mono<String> = webClient.get().uri("/sellers/authorization")
-        .retrieve()
-        .bodyToMono(String::class.java)
+    ): Mono<String> =
+        webClient.get().uri("/sellers/authorization")
+            .retrieve()
+            .bodyToMono(String::class.java)
 }

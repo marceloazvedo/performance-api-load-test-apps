@@ -36,12 +36,12 @@ services:
     ports:
       - 1080:1080
     environment:
-      MOCKSERVER_INITIALIZATION_JSON_PATH: ./config/initializerJson.json
+      MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
     networks:
       - api-performance-test
     volumes:
       - type: bind
-        source: .
+        source: ./config
         target: /config
 
 networks:

@@ -10,7 +10,6 @@ import reactor.netty.resources.ConnectionProvider
 
 @Component
 class WebClientConfig {
-
     companion object {
         val LOGGER = LoggerFactory.getLogger(WebClientConfig::class.java)
     }
@@ -18,12 +17,13 @@ class WebClientConfig {
     @Bean
     fun webClientBuilder(): WebClient.Builder {
         LOGGER.info("Create WebClientBuilder")
-        val httpClient = HttpClient.create(
-            ConnectionProvider.builder("myHttpClient")
-                .maxConnections(500000)
-                .pendingAcquireMaxCount(500000)
-                .build()
-        )
+        val httpClient =
+            HttpClient.create(
+                ConnectionProvider.builder("myHttpClient")
+                    .maxConnections(500000)
+                    .pendingAcquireMaxCount(500000)
+                    .build(),
+            )
         return WebClient.builder()
             .clientConnector(ReactorClientHttpConnector(httpClient))
     }

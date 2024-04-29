@@ -6,7 +6,7 @@
     },
     "httpResponse": {
       "body": {
-        "code": "uuid",
+        "code": "{{ uuid }}",
         "message": "SUCCESS"
       },
       "delay": {

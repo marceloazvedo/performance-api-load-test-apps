@@ -22,6 +22,12 @@ spring:
     hikari:
       maximum-pool-size: ${db_maximum_pool_size:100}
       minimum-idle: ${db_minimum_idle:100}
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    url: jdbc:postgresql://postgres-db:5432/spring-api-performance-test
+    password: password
+    user: postgres
 
 clients:
   seller: http://mockserver:1080

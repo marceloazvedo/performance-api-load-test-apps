@@ -44,10 +44,13 @@ class OrderService(
             .map { it.order!!.copy(id = it.orderEntity!!.id) }
     }
 
-    private fun createContext(orderDTO: OrderDTO, authorization: String): OrderContext =
+    private fun createContext(
+        orderDTO: OrderDTO,
+        authorization: String,
+    ): OrderContext =
         OrderContext(
             order = orderDTO,
-            sellerAccessToken = authorization
+            sellerAccessToken = authorization,
         )
 
     private fun validateRequest(orderContext: OrderContext): Mono<OrderContext> {
@@ -76,16 +79,22 @@ class OrderService(
     private fun makeRiskAnalysis(orderContext: OrderContext): Mono<OrderContext> {
         return riskAnalysisClient.analyseTransaction(orderContext.toTransactionData())
             .map {
-                if (it.recommendation == AnalysisRecommendation.APPROVE) orderContext
-                else throw RecommendationToDisapproveException()
+                if (it.recommendation == AnalysisRecommendation.APPROVE) {
+                    orderContext
+                } else {
+                    throw RecommendationToDisapproveException()
+                }
             }
     }
 
     private fun callGateway(orderContext: OrderContext): Mono<OrderContext> {
         return paymentGatewayClient.pay(orderContext.order!!.payment!!.paymentMethod!!)
             .map {
-                if (it.message == "SUCCESS") orderContext
-                else throw PaymentDeclinedException()
+                if (it.message == "SUCCESS") {
+                    orderContext
+                } else {
+                    throw PaymentDeclinedException()
+                }
             }
     }
 
@@ -96,13 +105,16 @@ class OrderService(
             .bind("taxId", orderContext.order.customer!!.taxId!!)
             .fetch()
             .first()
-            .map { (it["id"] as Int).toLong() }
+            .map { it["id"] as Long }
             .map {
-                orderContext.copy(customerEntity = CustomerEntity(
-                    id = it,
-                    fullName = orderContext.order.customer.fullName!!,
-                    taxId = orderContext.order.customer.taxId!!
-                ))
+                orderContext.copy(
+                    customerEntity =
+                        CustomerEntity(
+                            id = it,
+                            fullName = orderContext.order.customer.fullName!!,
+                            taxId = orderContext.order.customer.taxId!!,
+                        ),
+                )
             }
     }
 
@@ -115,18 +127,19 @@ class OrderService(
             .fetch()
             .first()
             .map {
-                val tableId = (it["table_id"] as Int).toLong()
+                val tableId = it["table_id"] as Long
                 val orderId = it["id"] as String
                 Pair(orderId, tableId)
             }
             .map { (id, tableId) ->
-                val orderEntity = OrderEntity(
-                    id = id,
-                    tableId = tableId,
-                    items = listOf(),
-                    customer = orderContext.customerEntity,
-                    referenceId = orderContext.order.referenceId!!,
-                )
+                val orderEntity =
+                    OrderEntity(
+                        id = id,
+                        tableId = tableId,
+                        items = listOf(),
+                        customer = orderContext.customerEntity,
+                        referenceId = orderContext.order.referenceId!!,
+                    )
                 orderContext.copy(orderEntity = orderEntity)
             }
     }
@@ -142,7 +155,7 @@ class OrderService(
                     .bind("ofOrder", orderContext.orderEntity!!.tableId)
                     .fetch().first()
                     .map {
-                        (it["id"] as Int).toLong()
+                        it["id"] as Long
                     }
             }.collectList()
             .flatMap {
@@ -155,5 +168,4 @@ class OrderService(
             .flatMap(::saveOrder)
             .flatMap(::saveItems)
     }
-
 }

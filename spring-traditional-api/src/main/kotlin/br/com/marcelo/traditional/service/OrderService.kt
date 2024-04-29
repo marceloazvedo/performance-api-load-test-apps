@@ -9,6 +9,7 @@ import br.com.marcelo.traditional.dto.OrderDTO
 import br.com.marcelo.traditional.exception.IdempontencyException
 import br.com.marcelo.traditional.exception.PaymentDeclinedException
 import br.com.marcelo.traditional.exception.RecommendationToDisapproveException
+import br.com.marcelo.traditional.repository.ItemRepository
 import br.com.marcelo.traditional.repository.OrderRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -20,6 +21,7 @@ class OrderService(
     private val riskAnalysisClient: RiskAnalysisClient,
     private val paymentGatewayClient: PaymentGatewayClient,
     private val orderRepository: OrderRepository,
+    private val itemRepository: ItemRepository,
 ) {
     companion object {
         val LOGGER = LoggerFactory.getLogger(OrderService::class.java)
@@ -41,7 +43,8 @@ class OrderService(
         if (paymentResponse!!.message != "SUCCESS") {
             throw PaymentDeclinedException()
         }
-        val orderEntity = orderRepository.save(context.toEntity())
+        val orderEntity = orderRepository.save(context.toEntity().copy(id = "ORDE_${UUID.randomUUID().toString().uppercase()}"))
+        context.order.items!!.forEach { itemRepository.save(it!!.toEntity(orderEntity)) }
         return context.order.copy(id = orderEntity.id)
     }
 }

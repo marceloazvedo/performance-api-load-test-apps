@@ -3,9 +3,7 @@ package br.com.marcelo.traditional.context
 import br.com.marcelo.traditional.dto.OrderDTO
 import br.com.marcelo.traditional.dto.TransactionDataDTO
 import br.com.marcelo.traditional.entity.CustomerEntity
-import br.com.marcelo.traditional.entity.ItemEntity
 import br.com.marcelo.traditional.entity.OrderEntity
-import java.util.UUID
 
 data class OrderContext(
     val sellerAccessToken: String? = null,
@@ -19,15 +17,8 @@ data class OrderContext(
 
     fun toEntity() =
         OrderEntity(
-            referenceId = UUID.randomUUID().toString(),
-            items =
-                this.order!!.items!!.map {
-                    ItemEntity(
-                        name = it!!.name!!,
-                        value = it.value!!,
-                        quantity = it.quantity!!,
-                    )
-                },
+            referenceId = this.order!!.referenceId!!,
+            items = listOf(),
             customer =
                 CustomerEntity(
                     fullName = this.order.customer!!.fullName!!,

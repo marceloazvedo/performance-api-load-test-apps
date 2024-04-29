@@ -67,7 +67,7 @@ class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
 
         setUp(
             scenario.injectOpen(
-                constantUsersPerSec(2.0).during(1),
+                constantUsersPerSec(500.0).during(30),
             ).protocols(http)
         )
     }

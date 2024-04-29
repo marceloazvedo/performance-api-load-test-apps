@@ -1,10 +1,7 @@
 package br.com.marcelo.reactive.config
 
-import io.r2dbc.pool.ConnectionPoolConfiguration
 import io.r2dbc.pool.PoolingConnectionFactoryProvider.INITIAL_SIZE
 import io.r2dbc.pool.PoolingConnectionFactoryProvider.MAX_SIZE
-import io.r2dbc.postgresql.PostgresqlConnectionConfiguration
-import io.r2dbc.postgresql.PostgresqlConnectionFactory
 import io.r2dbc.spi.ConnectionFactories
 import io.r2dbc.spi.ConnectionFactory
 import io.r2dbc.spi.ConnectionFactoryOptions
@@ -21,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
-import java.time.Duration
-
 
 @Component
 class DatabaseConfiguration(
@@ -39,7 +34,6 @@ class DatabaseConfiguration(
     @Value("\${spring.r2dbc.maximum-pool-size}")
     private val maxPoolSize: Int,
 ) {
-
     companion object {
         val LOGGER = LoggerFactory.getLogger(DatabaseConfiguration::class.java)
     }
@@ -47,7 +41,6 @@ class DatabaseConfiguration(
     @Bean
     @Qualifier("customConnectionFactory")
     fun connectionFactory(): ConnectionFactory {
-
         LOGGER.info("initial pool size: {}", initialPoolSize)
         LOGGER.info("max pool size: {}", maxPoolSize)
 
@@ -62,15 +55,12 @@ class DatabaseConfiguration(
                 .option(DATABASE, database)
                 .option(INITIAL_SIZE, initialPoolSize)
                 .option(MAX_SIZE, maxPoolSize)
-                .build()
+                .build(),
         )
     }
 
     @Bean
-    fun databaseClient(
-        connectionFactory: ConnectionFactory
-    ): DatabaseClient {
+    fun databaseClient(connectionFactory: ConnectionFactory): DatabaseClient {
         return DatabaseClient.create(connectionFactory)
     }
-
 }

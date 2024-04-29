@@ -13,15 +13,16 @@ import reactor.core.publisher.Mono
 class RiskAnalysisClient(
     @Value("\${clients.risk-analysis}")
     private val riskAnalysisUrl: String,
-    private val webClientBuilder: WebClient.Builder
+    private val webClientBuilder: WebClient.Builder,
 ) {
     private val webClient: WebClient = webClientBuilder.baseUrl(riskAnalysisUrl).build()
+
     fun analyseTransaction(
         @RequestBody transactionData: TransactionDataDTO,
-    ): Mono<RiskAnalysisRecommendation>
-    = webClient.post()
-        .uri("/risk-analysis/validate")
-        .body(BodyInserters.fromValue(transactionData))
-        .retrieve()
-        .bodyToMono(RiskAnalysisRecommendation::class.java)
+    ): Mono<RiskAnalysisRecommendation> =
+        webClient.post()
+            .uri("/risk-analysis/validate")
+            .body(BodyInserters.fromValue(transactionData))
+            .retrieve()
+            .bodyToMono(RiskAnalysisRecommendation::class.java)
 }
