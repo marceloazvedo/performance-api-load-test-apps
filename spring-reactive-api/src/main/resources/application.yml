@@ -28,9 +28,9 @@ spring:
     user: postgres
 
 clients:
-  seller: http://mockserver:1080
-  risk-analysis: http://mockserver:1080
-  payment-gateway: http://mockserver:1080
+  seller: http://spring-reactive-mock:9090
+  risk-analysis: http://spring-reactive-mock:9090
+  payment-gateway: http://spring-reactive-mock:9090
 
 feign:
   client:

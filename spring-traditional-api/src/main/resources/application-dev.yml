@@ -30,9 +30,9 @@ spring:
     user: postgres
 
 clients:
-  seller: http://localhost:1080
-  risk-analysis: http://localhost:1080
-  payment-gateway: http://localhost:1080
+  seller: http://localhost:9090
+  risk-analysis: http://localhost:9090
+  payment-gateway: http://localhost:9090
 
 feign:
   client:

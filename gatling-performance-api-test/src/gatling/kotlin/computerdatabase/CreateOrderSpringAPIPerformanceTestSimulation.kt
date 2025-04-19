@@ -5,7 +5,6 @@ import io.gatling.javaapi.core.CoreDsl.*
 import io.gatling.javaapi.http.HttpDsl.*
 import io.gatling.javaapi.http.internal.HttpCheckBuilders
 import java.util.UUID
-import java.util.Iterator
 
 class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
 
@@ -24,42 +23,42 @@ class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
                         .body(
                             StringBody(
                                 """
-                            |{
-                            |   "reference_id": "#{uuid}",
-                            |   "payment": {
-                            |       "amount": 100000,
-                            |       "payment_method": {
-                            |           "type": "CREDIT_CARD",
-                            |           "installments": 3,
-                            |           "card": {
-                            |               "number": "1111222233334444",
-                            |               "holder": "Farmindrongo Pernelope",
-                            |               "cvv": "123",
-                            |               "expiration_date": "12-2031"
-                            |           }
-                            |       }
-                            |   },
-                            |   "items": [
-                            |       {
-                            |           "name": "lampada magica",
-                            |           "quantity": 2,
-                            |           "value": 50000
-                            |       }
-                            |   ],
-                            |   "customer": {
-                            |       "full_name": "Farmindrongo Pernelope",
-                            |       "tax_id": "11111111111",
-                            |       "address": {
-                            |           "street": "rua dos bobos",
-                            |           "number": "AP 101",
-                            |           "state": "RN",
-                            |           "city": "Santana do Seridó",
-                            |           "locality": "Centro",
-                            |           "zipCode": "59350000",
-                            |           "complement": null
-                            |       }
-                            |   }
-                            |}
+                            {
+                              "reference_id": "#{uuid}",
+                              "payment": {
+                                "amount": 32750,
+                                "payment_method": {
+                                  "type": "CREDIT_CARD",
+                                  "installments": 5,
+                                  "card": {
+                                    "number": "4539511619543487",
+                                    "holder": "Alcides Trombone",
+                                    "cvv": "482",
+                                    "expiration_date": "09-2029"
+                                  }
+                                }
+                              },
+                              "items": [
+                                {
+                                  "name": "Caneca Mágica do Dragão",
+                                  "quantity": 1,
+                                  "value": 32750
+                                }
+                              ],
+                              "customer": {
+                                "full_name": "Alcides Trombone",
+                                "tax_id": "03658924713",
+                                "address": {
+                                  "street": "Avenida das Palmeiras",
+                                  "number": "SN 204",
+                                  "state": "SP",
+                                  "city": "Campinas",
+                                  "locality": "Jardim das Estrelas",
+                                  "zipCode": "13040000",
+                                  "complement": "Próximo à padaria"
+                                }
+                              }
+                            }
                             """.trimMargin()
                             )
                         ).check(HttpCheckBuilders.status().`is`(200))
@@ -67,7 +66,9 @@ class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
 
         setUp(
             scenario.injectOpen(
+                rampUsers(500).during(30),
                 constantUsersPerSec(500.0).during(30),
+                rampUsers(0).during(30),
             ).protocols(http)
         )
     }

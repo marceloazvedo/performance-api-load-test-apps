@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     hostname: postgres-db
@@ -14,21 +12,6 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     networks:
       - api-performance-test
-
-  pgadmin:
-    hostname: pgadmin
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin123admin
-    ports:
-      - "16543:80"
-    depends_on:
-      - postgres
-    networks:
-      - api-performance-test
-    volumes:
-      - ./data/pgadmin:/var/lib/pgadmin
 
   mockserver:
     hostname: mockserver

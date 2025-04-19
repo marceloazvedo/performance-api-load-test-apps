@@ -32,6 +32,6 @@ poderá realizar requisições direto para a máquina.
 Comando curto para limpar e construir a aplicação, buildar a imagem docker e a executar:
 ```shell
 ./gradlew clean build && \
-	docker build -t spring-reactive-api . && \
-	docker run --memory=512m --memory-swap=1g --cpus=1 --network performance-test-network -p 8081:8081 -e DB_MAXIMUM_POOL_SIZE=100 -e DB_MINIMUM_IDLE=10 spring-reactive-api:latest
+	docker build -t spring-reactive-mock . && \
+	docker run --memory=512m --memory-swap=1g --cpus=1 --network performance-test-network -p 900:9090 spring-reactive-mock:latest
 ```

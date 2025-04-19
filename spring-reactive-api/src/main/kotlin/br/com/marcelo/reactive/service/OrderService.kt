@@ -12,9 +12,11 @@ import br.com.marcelo.reactive.exception.IdempontencyException
 import br.com.marcelo.reactive.exception.PaymentDeclinedException
 import br.com.marcelo.reactive.exception.RecommendationToDisapproveException
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.UUID
@@ -42,6 +44,10 @@ class OrderService(
             .flatMap(this::callGateway)
             .flatMap(this::save)
             .map { it.order!!.copy(id = it.orderEntity!!.id) }
+            .doOnError { ex -> LOGGER.error("Error during validateRequest: ${ex.message}", ex) }
+            .onErrorResume(IdempontencyException::class.java) {
+                Mono.error(ResponseStatusException(HttpStatus.CONFLICT, "Order already exists"))
+            }
     }
 
     private fun createContext(
@@ -57,6 +63,7 @@ class OrderService(
         return verifyIdempotency(orderContext)
             .flatMap(::validateSellerToken)
             .flatMap(::makeRiskAnalysis)
+            .doOnNext { LOGGER.info("validating request finished") }
     }
 
     private fun verifyIdempotency(orderContext: OrderContext): Mono<OrderContext> {
@@ -66,13 +73,20 @@ class OrderService(
             .map { it["id"] as String }
             .defaultIfEmpty(ORDER_NOT_FOUND)
             .map {
-                if (it != ORDER_NOT_FOUND) throw IdempontencyException()
+                if (it != ORDER_NOT_FOUND) {
+                    LOGGER.warn("Reference ID already exists: {}", orderContext.order!!.referenceId)
+                    throw IdempontencyException()
+                }
                 orderContext
             }
+            .doOnNext { LOGGER.info("validating idempotency finished") }
     }
 
     private fun validateSellerToken(orderContext: OrderContext): Mono<OrderContext> {
         return sellerClient.validateToken(orderContext.sellerAccessToken!!)
+            .doOnNext { LOGGER.info("validating seller token") }
+            .doOnError { LOGGER.info("error validating seller token") }
+            .doOnCancel { LOGGER.info("canceled?") }
             .map { orderContext }
     }
 
@@ -85,6 +99,7 @@ class OrderService(
                     throw RecommendationToDisapproveException()
                 }
             }
+            .doOnNext { LOGGER.info("validating risk analysis") }
     }
 
     private fun callGateway(orderContext: OrderContext): Mono<OrderContext> {
@@ -96,6 +111,7 @@ class OrderService(
                     throw PaymentDeclinedException()
                 }
             }
+            .doOnNext { LOGGER.info("gateway called") }
     }
 
     private fun saveCustomer(orderContext: OrderContext): Mono<OrderContext> {
@@ -116,6 +132,7 @@ class OrderService(
                         ),
                 )
             }
+            .doOnNext { LOGGER.info("customer saved") }
     }
 
     private fun saveOrder(orderContext: OrderContext): Mono<OrderContext> {
@@ -142,6 +159,7 @@ class OrderService(
                     )
                 orderContext.copy(orderEntity = orderEntity)
             }
+            .doOnNext { LOGGER.info("order saved") }
     }
 
     private fun saveItems(orderContext: OrderContext): Mono<OrderContext> {
@@ -161,11 +179,13 @@ class OrderService(
             .flatMap {
                 Mono.just(orderContext)
             }
+            .doOnNext { LOGGER.info("items saved") }
     }
 
     private fun save(orderContext: OrderContext): Mono<OrderContext> {
         return saveCustomer(orderContext)
             .flatMap(::saveOrder)
             .flatMap(::saveItems)
+            .doOnNext { LOGGER.info("saved") }
     }
 }

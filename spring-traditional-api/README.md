@@ -33,5 +33,5 @@ Comando curto para limpar e constru
 ```shell
 ./gradlew clean build && \
 	docker build -t spring-traditional-api . && \
-	docker run --network performance-test-network -p 8081:8081 -e DB_MAXIMUM_POOL_SIZE=100 -e DB_MINIMUM_IDLE=10 spring-traditional-api:latest
+	docker run --memory=512m --memory-swap=1g --cpus=1 --network performance-test-network -p 8081:8081 -e DB_MAXIMUM_POOL_SIZE=100 -e DB_MINIMUM_IDLE=10 spring-traditional-api:latest
 ```
