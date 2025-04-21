@@ -8,6 +8,11 @@ import java.util.UUID
 
 class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
 
+    companion object {
+        var FINAL_LOAD = 750
+        var CONSTANT_DURATION = 30L
+    }
+
     init {
         val http = http
             .baseUrl("http://localhost:8081")
@@ -66,9 +71,9 @@ class CreateOrderSpringAPIPerformanceTestSimulation : Simulation() {
 
         setUp(
             scenario.injectOpen(
-                rampUsers(500).during(30),
-                constantUsersPerSec(500.0).during(30),
-                rampUsers(0).during(30),
+                rampUsers(FINAL_LOAD).during(CONSTANT_DURATION),
+                constantUsersPerSec(FINAL_LOAD.toDouble()).during(CONSTANT_DURATION),
+                rampUsers(0).during(CONSTANT_DURATION),
             ).protocols(http)
         )
     }
